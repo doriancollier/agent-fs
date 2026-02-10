@@ -1,0 +1,37 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"],
+      "env": {}
+    },
+    "mcp-dev-db": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "http://localhost:3000/api/mcp/mcp",
+        "--allow-http"
+      ],
+      "description": "Development database MCP server for safe SQL operations (stateless HTTP, no Redis required)"
+    },
+    "context7": {
+      "description": "Up-to-date documentation.",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    },
+    "replicate": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "replicate-mcp"],
+      "env": {
+        "REPLICATE_API_TOKEN": "your_replicate_api_token_here"
+      } 
+    }
+  }
+}
