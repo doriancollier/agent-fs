@@ -27,7 +27,7 @@ export default function InteractiveDemo() {
     setLastCommand(command);
     
     // Parse and simulate command execution
-    // In a real implementation, this would run against actual SqliteFs
+    // In a real implementation, this would run against actual AgentFs
     
     if (command.includes('echo') && command.includes('>')) {
       // Simulate file write

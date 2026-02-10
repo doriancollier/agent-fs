@@ -25,7 +25,7 @@ import type {
   BufferEncoding,
 } from './types.js';
 
-export interface SqliteFsOptions {
+export interface AgentFsOptions {
   /** Database file path (or ':memory:' for in-memory) */
   dbPath: string;
   /** Optional user ID for multi-tenant scenarios */
@@ -41,11 +41,11 @@ interface DbFileRow {
   mtime: number;
 }
 
-export class SqliteFs implements IFileSystem {
+export class AgentFs implements IFileSystem {
   private db: Database.Database;
   private userId: string;
 
-  constructor(options: SqliteFsOptions) {
+  constructor(options: AgentFsOptions) {
     this.db = new Database(options.dbPath);
     this.userId = options.userId || 'default';
     this.initSchema();

@@ -1,10 +1,10 @@
 /**
- * @sqlite-vfs/core
- * 
+ * @agent-vfs/core
+ *
  * SQLite-backed virtual filesystem for AI coding agents in serverless environments
  */
 
-export { SqliteFs, type SqliteFsOptions } from './sqlite-fs.js';
+export { AgentFs, type AgentFsOptions } from './agent-fs.js';
 export type {
   IFileSystem,
   ReadFileOptions,

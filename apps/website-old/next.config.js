@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['@sqlite-vfs/core'],
+  transpilePackages: ['@agent-vfs/core'],
   webpack: (config) => {
     // Required for sql.js (WASM SQLite in browser)
     config.resolve.fallback = {

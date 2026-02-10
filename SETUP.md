@@ -5,7 +5,7 @@ Your monorepo is ready with Turborepo structure.
 ## What Was Created
 
 ```
-sqlite-vfs-monorepo/
+agent-vfs-monorepo/
 ├── apps/
 │   └── website/              # Next.js site with interactive demo
 │       ├── app/
@@ -20,9 +20,9 @@ sqlite-vfs-monorepo/
 │       ├── next.config.js
 │       └── tailwind.config.ts
 ├── packages/
-│   └── core/                 # @sqlite-vfs/core library
+│   └── core/                 # @agent-vfs/core library
 │       ├── src/
-│       │   ├── sqlite-fs.ts  # Main filesystem implementation
+│       │   ├── agent-fs.ts   # Main filesystem implementation
 │       │   └── index.ts      # Public exports
 │       ├── package.json
 │       └── tsconfig.json
@@ -101,7 +101,7 @@ npm run clean      # Clean all build artifacts
 
 1. **Enhance the demo**
    - Add more bash commands (cat, ls, rm)
-   - Wire up actual SqliteFs execution
+   - Wire up actual AgentFs execution
    - Add syntax highlighting
 
 2. **Add documentation pages**
@@ -121,7 +121,7 @@ npm run clean      # Clean all build artifacts
 - **Monorepo**: Turborepo manages workspace
 - **Core Package**: Pure TypeScript library
 - **Website**: Next.js 15 + React 19 + Tailwind CSS
-- **Demo**: Client-side simulation (will connect to actual SqliteFs)
+- **Demo**: Client-side simulation (will connect to actual AgentFs)
 
 ## Issues?
 

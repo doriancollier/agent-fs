@@ -1,4 +1,4 @@
-# SQLite VFS Monorepo
+# AgentVFS Monorepo
 
 SQLite-backed virtual filesystem for running AI coding agents in serverless environments.
 
@@ -12,7 +12,7 @@ This Turborepo includes:
 
 ### Packages
 
-- **`@sqlite-vfs/core`**: The core SQLite virtual filesystem library
+- **`@agent-vfs/core`**: The core AgentVFS virtual filesystem library
 
 ## Quick Start
 

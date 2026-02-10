@@ -1,5 +1,5 @@
 {
-  "name": "@sqlite-vfs/core",
+  "name": "@agent-vfs/core",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",

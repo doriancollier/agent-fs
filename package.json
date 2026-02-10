@@ -1,5 +1,5 @@
 {
-  "name": "sqlite-vfs-monorepo",
+  "name": "agent-vfs-monorepo",
   "version": "0.1.0",
   "private": true,
   "workspaces": [
@@ -12,7 +12,10 @@
     "test": "turbo test",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
-    "clean": "turbo clean && rm -rf node_modules"
+    "clean": "turbo clean && rm -rf node_modules",
+    "subtree:pull": "git subtree pull --prefix=apps/website dorkian-next-stack main --squash",
+    "subtree:push": "git subtree push --prefix=apps/website dorkian-next-stack",
+    "subtree:diff": "git subtree split --prefix=apps/website --branch=_subtree-split && git fetch dorkian-next-stack main && git diff dorkian-next-stack/main _subtree-split && git branch -D _subtree-split"
   },
   "devDependencies": {
     "turbo": "^2.3.3",

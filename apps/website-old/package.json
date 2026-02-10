@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@sqlite-vfs/core": "file:../../packages/core",
+    "@agent-vfs/core": "file:../../packages/core",
     "next": "^15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

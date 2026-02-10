@@ -110,7 +110,7 @@ Type 'help' for available commands`;
         {/* Welcome message */}
         {history.length === 0 && (
           <div className="text-slate-400 mb-4">
-            <p>Welcome to the SQLite VFS Interactive Demo!</p>
+            <p>Welcome to the AgentVFS Interactive Demo!</p>
             <p className="mt-2">Type <span className="text-green-400">help</span> to see available commands.</p>
             <p className="mt-1">Try: <span className="text-green-400">echo "Hello!" &gt; /workspace/hello.txt</span></p>
           </div>
