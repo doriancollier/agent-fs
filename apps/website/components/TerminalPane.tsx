@@ -72,6 +72,7 @@ Try: echo "Hello!" > /workspace/hello.txt`;
   (This will show file contents in real implementation)`;
       } else {
         output = 'Error: Missing file path';
+      }
     } else if (command.startsWith('rm')) {
       output = 'Feature coming soon!';
     } else {
