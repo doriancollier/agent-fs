@@ -1,6 +1,6 @@
 ---
 description: Structured ideation with documentation
-allowed-tools: Read, Grep, Glob, Task, TaskOutput, Write, Bash(git:*), Bash(npm:*), Bash(npx:*), Bash(python3:*), Bash(mkdir:*)
+allowed-tools: Read, Grep, Glob, Task, TaskOutput, Write, AskUserQuestion, Bash(git:*), Bash(npm:*), Bash(npx:*), Bash(python3:*), Bash(mkdir:*)
 argument-hint: "[--roadmap-id <uuid> | --roadmap-item \"<title>\"] <task-brief>"
 category: workflow
 ---
@@ -176,16 +176,88 @@ If the task is a bug fix:
 
 2. Select the most likely hypothesis with evidence from exploration
 
-### Step 4.2: Clarification Questions
+### Step 4.2: Triage Clarifications
 
-Based on exploration and research findings, create a list of:
-- Unspecified requirements
-- Decisions the user needs to make
-- Trade-offs that need resolution
+Based on exploration and research findings, identify every open question, unspecified requirement, assumption, and trade-off. Then **triage** each into one of three categories:
 
-### Step 4.3: Write Ideation Document
+| Category | Action | Example |
+|----------|--------|---------|
+| **Researchable** | Answer it yourself from agent findings. Do NOT ask the user. | "What ORM does this project use?" → Found Prisma in codebase |
+| **Assumption validation** | Present your assumption and ask the user to confirm or correct. | "I'm assuming we only need to support modern browsers. Correct?" |
+| **True decision** | Present 2-4 options with trade-offs and your recommendation. | "Should auth use JWT or sessions?" |
 
-Create `specs/{slug}/01-ideation.md` with all gathered information.
+**Rules for triaging:**
+- If the answer exists in the codebase exploration or research results, it is **Researchable** — resolve it silently
+- If you've made an assumption that could be wrong and would change the approach, it is **Assumption validation**
+- If there are genuinely different paths with meaningful trade-offs, it is a **True decision**
+- When in doubt, research first. Only ask what you truly cannot answer yourself
+
+Store researchable answers as `resolved_questions` for the document.
+
+### Step 4.3: Interactive Clarification
+
+For each **Assumption validation** and **True decision** question, ask the user using `AskUserQuestion`. Ask **one question at a time** so each answer can inform the next question.
+
+**Before presenting each question:**
+1. Think deeply about the possible answers and their implications
+2. Consider which answer best fits the project's existing patterns, constraints, and goals
+3. Formulate a clear recommendation with reasoning
+
+**Use `AskUserQuestion` with structured options:**
+
+```javascript
+AskUserQuestion({
+  questions: [{
+    question: "Should the new API endpoint require authentication?",
+    header: "Auth scope",
+    multiSelect: false,
+    options: [
+      {
+        label: "Authenticated only (Recommended)",
+        description: "Matches existing API patterns in this codebase. Lower blast radius since only logged-in users can trigger this code path."
+      },
+      {
+        label: "Public with rate limiting",
+        description: "Broader access but requires implementing rate limiting infrastructure that doesn't exist in this project yet."
+      },
+      {
+        label: "Public, no restrictions",
+        description: "Simplest to implement but inconsistent with existing endpoints and creates abuse risk."
+      }
+    ]
+  }]
+})
+```
+
+**Question quality rules:**
+- Lead with the recommended option (append `(Recommended)` to its label) and explain *why* in the description
+- Descriptions should convey trade-offs concretely, not generically
+- Use `multiSelect: true` only when multiple options can genuinely coexist
+- After each answer, re-evaluate whether subsequent questions are still relevant or need rephrasing
+- If a user's answer resolves multiple downstream questions, skip those questions
+- If a user's answer introduces a novel consideration, ask a follow-up before continuing
+
+Store all user answers as `user_decisions` for the next step.
+
+### Step 4.4: Re-Synthesize Based on Answers
+
+**This step is critical.** User answers may change your initial analysis. Before writing the document, revisit and update:
+
+1. **Research recommendation** — Does the user's answer change which approach is best? If they chose a non-recommended option, re-evaluate the pros/cons in light of their reasoning.
+
+2. **Codebase map / blast radius** — Does the chosen approach affect different files than originally mapped? Add or remove components from the blast radius.
+
+3. **Assumptions** — Update the assumptions list: remove invalidated ones, add newly confirmed ones, note any corrections the user made.
+
+4. **Root cause analysis** (bug fixes) — If user feedback changes the hypothesis, update the selected root cause.
+
+5. **Out of scope** — If clarification revealed scope changes, update accordingly.
+
+The ideation document should reflect the **post-clarification** state of thinking, not the pre-clarification draft with answers bolted on.
+
+### Step 4.5: Write Ideation Document
+
+Create `specs/{slug}/01-ideation.md` with all gathered and synthesized information.
 
 **Document Structure:**
 
@@ -207,39 +279,51 @@ slug: {slug}
 
 ## 1) Intent & Assumptions
 - **Task brief:** {task description}
-- **Assumptions:** {bulleted list}
-- **Out of scope:** {bulleted list}
+- **Assumptions:** {bulleted list — updated based on user answers}
+- **Out of scope:** {bulleted list — updated based on user answers}
 
 ## 2) Pre-reading Log
 {From exploration agent - files/docs read with takeaways}
 - `path/to/file`: takeaway...
 
 ## 3) Codebase Map
-{From exploration agent}
+{From exploration agent — updated if user answers changed blast radius}
 - **Primary components/modules:** {paths + roles}
 - **Shared dependencies:** {theme/hooks/utils/stores}
 - **Data flow:** {source → transform → render}
 - **Feature flags/config:** {flags, env, owners}
-- **Potential blast radius:** {areas impacted}
+- **Potential blast radius:** {areas impacted — re-evaluated post-clarification}
 
 ## 4) Root Cause Analysis
-{Only for bug fixes - from main context analysis}
+{Only for bug fixes — updated if user feedback changed hypothesis}
 - **Repro steps:** {numbered list}
 - **Observed vs Expected:** {concise description}
 - **Evidence:** {code refs, logs, CSS/DOM snapshots}
 - **Root-cause hypotheses:** {bulleted with confidence}
 - **Decision:** {selected hypothesis + rationale}
 
-## 5) Research
-{From research agent}
+## 5) Research & Recommendation
+{From research agent — recommendation updated based on user decisions}
 - **Potential solutions:** {numbered list with pros and cons}
-- **Recommendation:** {concise description}
+- **Recommendation:** {updated recommendation incorporating user decisions}
+- **Rationale:** {why this approach, citing both research and user input}
 
-## 6) Clarification
-- **Clarifications:** {numbered list with decisions for user}
+## 6) Decisions Made
+{All questions resolved during ideation — no open items}
+
+### Resolved via Research
+- {question} → {answer} (source: {exploration/research finding})
+
+### User Decisions
+- {question} → {user's chosen option} — {brief rationale}
+
+### Validated Assumptions
+- {assumption} → Confirmed / Corrected to: {correction}
 ```
 
-### Step 4.4: Display Completion Summary
+**Important:** Section 6 should contain **zero open questions**. Everything is resolved. If `/ideate-to-spec` later surfaces new questions during spec creation, those are handled by its own Step 6a-6d workflow.
+
+### Step 4.6: Display Completion Summary
 
 ```
 ═══════════════════════════════════════════════════
@@ -252,14 +336,11 @@ slug: {slug}
    - Files explored: [X]
    - Components mapped: [Y]
    - Approaches researched: [Z]
-
-📝 Clarifications needed: [N] items
-   (Review section 6 of the ideation document)
+   - Questions resolved: [N] ([R] via research, [U] via user input)
 
 🚀 Next Steps:
    1. Review the ideation document
-   2. Answer clarification questions if any
-   3. Run: /ideate-to-spec specs/[slug]/01-ideation.md
+   2. Run: /ideate-to-spec specs/[slug]/01-ideation.md
 
 ═══════════════════════════════════════════════════
 ```
